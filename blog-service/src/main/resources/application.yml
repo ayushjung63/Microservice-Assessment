@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: blog-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog_db
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+security:
+  oauth2:
+    resource:
+      token-info-uri: http://localhost:9001/oauth/check_token
+    client:
+      client-id: clientId
+      client-secret: secret
+
+logging:
+  level:
+    org:
+      springframework: debug
+server:
+  port: 8081

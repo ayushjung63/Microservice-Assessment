@@ -1,0 +1,37 @@
+server:
+  port: 8070
+
+spring:
+  cloud:
+    discovery:
+      enabled: true
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path= /auth/**
+          filters:
+            - RewritePath=/auth/(?<path>.*), /$\{path}
+        - id: blog-service
+          uri: lb://blog-service
+          predicates:
+            - Path= /blog/**
+          filters:
+            - RewritePath=/blog/(?<path>.*), /$\{path}
+  application:
+    name: api-gateway
+    gateway:
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
