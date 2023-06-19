@@ -17,6 +17,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import javax.sql.DataSource;
 
+/*
+* AuthorizationServer is responsilble to authenticate the user
+* */
 @RequiredArgsConstructor
 @Configuration
 @EnableAuthorizationServer
@@ -27,6 +30,9 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     private final DataSource dataSource;
     private JwtAccessTokenConverter jwtAccessTokenConverter;
 
+    /*
+    * Override Token provided by OAuth with custom JWT attributes.
+    * */
     @Bean
     public JwtAccessTokenConverter tokenEnhancer() {
         if (jwtAccessTokenConverter != null) {

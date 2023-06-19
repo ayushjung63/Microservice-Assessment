@@ -7,27 +7,38 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.token.TokenService;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
 public class CustomPermissionEvaluator  implements PermissionEvaluator {
     @Autowired
-    private TokenProcessor tokenProcessor;
+    private TokenStore tokenStore;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        List<String> authorities = tokenProcessor.getAuthorities();
-        for (String perm : authorities){
-            //As Authority Are Assigned as ControllerName_PermissionName so
-            Boolean hasAccess = authentication.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals(perm));
-            if(hasAccess) return true;
-            //Else Loop Will be continued
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            /* extract token from Security Context */
+            OAuth2AuthenticationDetails auth2AuthenticationDetails =
+                    (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+            Map<String, Object> details = tokenStore.readAccessToken(auth2AuthenticationDetails.getTokenValue()).getAdditionalInformation();
+
+            //if authorities is null in token, access denied
+            if (details.get("authorities") == null) return false;
+
+            List<String> permissionList = (List<String>) details.get("authorities");
+            String permissionName = String.valueOf(permission);
+            return permissionList.contains(permissionName); //returns true if permissionList contain mentioned permission
+        } else {
+            throw new RuntimeException("Something Went Wrong");
         }
-        return false;
     }
 
     @Override

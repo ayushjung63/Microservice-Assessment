@@ -1,18 +1,24 @@
 spring:
   application:
     name: blog-service
+  # DB CONFIG
   datasource:
     url: jdbc:mysql://localhost:3306/blog_db
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+  # HIBERNATE CONFIG
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
+  main:
+    allow-bean-definition-overriding: true
 
+
+# TOKEN CHECK URL to AuthorizationServer
 security:
   oauth2:
     resource:
@@ -21,9 +27,19 @@ security:
       client-id: clientId
       client-secret: secret
 
+  jwt:
+    key-store: classpath:keystore.jks
+    key-store-password: letmein
+    key-pair-alias: mytestkey
+    key-pair-password: changeme
+
+
+
 logging:
   level:
     org:
       springframework: debug
+
+# SERVER PORT
 server:
   port: 8081

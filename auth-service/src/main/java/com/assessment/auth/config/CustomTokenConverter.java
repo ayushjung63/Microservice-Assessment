@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*
+* CustomTokenConverter to override Token
+* */
 public class CustomTokenConverter extends JwtAccessTokenConverter {
 
     @Autowired
@@ -22,7 +25,14 @@ public class CustomTokenConverter extends JwtAccessTokenConverter {
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
         if (authentication.getOAuth2Request().getGrantType().equalsIgnoreCase("password")) {
+            /*
+            * fetch user from db by email
+            * */
             User user = userRepo.findByEmail(authentication.getName()).get();
+
+            /*
+            *  Additional Information that need to be put in JWT token are configured here.
+            * */
             final Map<String, Object> additionalInfo = new HashMap<String, Object>();
             additionalInfo.put("userId", user.getId());
             additionalInfo.put("email", user.getEmail());
@@ -31,6 +41,9 @@ public class CustomTokenConverter extends JwtAccessTokenConverter {
                 roles.add(roleGroup.getName());
             }
             additionalInfo.put("roles", roles);
+            /*
+            * setting additionalInfo in token
+            * */
             ((DefaultOAuth2AccessToken) accessToken)
                     .setAdditionalInformation(additionalInfo);
         }

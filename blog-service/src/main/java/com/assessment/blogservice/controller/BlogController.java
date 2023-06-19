@@ -77,7 +77,7 @@ public class BlogController extends BaseController {
             )
     )
     @PostMapping("/save")
-    @PreAuthorize("hasPermission(#this.this.permissionName,'CREATE')")
+    @PreAuthorize("hasPermission(#this,'CREATE')")
     private ResponseEntity<ApiResponse> createOrUpdateBlog(@Valid @RequestBody BlogRequestPojo blogRequestPojo){
         Integer data = blogService.createOrUpdate(blogRequestPojo);
         return new ResponseEntity(
@@ -98,6 +98,7 @@ public class BlogController extends BaseController {
                     content = {@Content(schema = @Schema(implementation = Integer.class ))}
             )
     )
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/id/{id}")
     private ResponseEntity<ApiResponse> createOrUpdateBlog(@PathVariable("id") Integer id){
         Integer data = blogService.deleteById(id);
